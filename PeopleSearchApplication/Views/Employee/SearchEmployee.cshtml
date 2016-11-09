@@ -1,0 +1,115 @@
+﻿@using PeopleSearchApplication.Models
+@model PagedList.IPagedList<PeopleSearchApplication.Models.Employee>
+@using PagedList.Mvc;
+
+@if (Model.Count() > 0)
+{
+    <table class="table" id="EmployeeTable">
+        <tr>
+            <th>
+                @Ajax.ActionLink("First Name", "SearchEmployee",
+                    new { sortOrder = ViewBag.CurrentSort == "firstname_asc" ? "firstname_desc" : "firstname_asc", searchName = ViewBag.CurrentFilter, page = ViewBag.Page },
+                    new AjaxOptions()
+                    {
+                        UpdateTargetId = "searchResults",
+                        HttpMethod = "Get",
+                        InsertionMode = InsertionMode.Replace
+                    })
+            </th>
+            <th>
+                @Ajax.ActionLink("Last Name", "SearchEmployee",
+                    new { sortOrder = ViewBag.CurrentSort == "lastname_asc" ? "lastname_desc" : "lastname_asc", searchName = ViewBag.CurrentFilter, page = ViewBag.Page },
+                    new AjaxOptions()
+                    {
+                        UpdateTargetId = "searchResults",
+                        HttpMethod = "Get",
+                        InsertionMode = InsertionMode.Replace
+                    })
+            </th>
+            <th>
+                Address
+            </th>
+            <th>
+                @Ajax.ActionLink("Age", "SearchEmployee",
+                    new { sortOrder = ViewBag.CurrentSort == "age_asc" ? "age_desc" : "age_asc", searchName = ViewBag.CurrentFilter, page = ViewBag.Page },
+                    new AjaxOptions()
+                    {
+                        UpdateTargetId = "searchResults",
+                        HttpMethod = "Get",
+                        InsertionMode = InsertionMode.Replace
+                    })
+            </th>
+            <th>
+                Interests
+            </th>
+            <th>
+                Image
+            </th>
+            <th></th>
+        </tr>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FirstName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.LastName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Address)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Age)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Interests)
+                    </td>
+                    <td>
+                        @if (item.Image != null)
+                        {
+                            <img src="~/Employee/RetrieveImage/@item.EmployeeId" alt="" height=120 width=120 />
+                        }
+                        else
+                        {
+                            <img src="~/UserData/DefaultImage.png" alt="" height=120 width=120 />
+                        }
+                    </td>
+                    <td>
+                        @Html.ActionLink("Edit", "Edit", new { id = item.EmployeeId }) |
+                        @Html.ActionLink("Details", "Details", new { id = item.EmployeeId }) |
+                        @Html.ActionLink("Delete", "Delete", new { id = item.EmployeeId })
+                    </td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+}
+else
+{
+    <br/><h3>No Results Found!</h3>
+}
+
+Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+
+@Html.PagedListPager(Model, page => Url.Action("SearchEmployee",
+    new { page, sortOrder = ViewBag.CurrentSort, searchName = ViewBag.CurrentFilter }),
+     PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(
+         new PagedListRenderOptions
+         {
+             Display = PagedListDisplayMode.IfNeeded,
+             MaximumPageNumbersToDisplay = null
+         },
+         new AjaxOptions()
+         {
+             UpdateTargetId = "searchResults",
+             HttpMethod = "Get",
+             InsertionMode = InsertionMode.Replace
+         }
+    ))
+@section Scripts {
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryval")
+}

@@ -1,0 +1,49 @@
+﻿@model PagedList.IPagedList<PeopleSearchApplication.Models.Employee>
+
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+@{
+    ViewBag.Title = "List of Employees";
+    AjaxOptions ajaxOptions = new AjaxOptions
+    {
+        UpdateTargetId = "searchResults",
+        HttpMethod = "Get",
+        InsertionMode = InsertionMode.Replace
+    };
+}
+
+<h2>Employee</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+
+<div class="form-group">
+    <label>Search by Name: </label>
+    @Html.TextBox("TxtSearchName", ViewBag.CurrentFilter as string)
+</div>
+
+<div id="searchResults">
+    @Html.Partial("~/Views/Employee/SearchEmployee.cshtml")
+</div>
+@section Scripts {
+    @Scripts.Render("~/bundles/jquery")
+}
+<script type="text/javascript">
+
+    var timer;
+    $("#TxtSearchName").on('keyup', function (event) {
+        clearTimeout(timer);
+        timer = setTimeout(function () {
+            $.ajax({
+                url: '@Url.Action("SearchEmployee", "Employee")',
+                dataType: "html",
+                data: { sortOrder: '@ViewBag.CurrentSort', searchName: $('#TxtSearchName').val() },
+                type: "Get",
+                success: function (data) {
+                    $('#searchResults').html(data);
+                }
+            })
+        }, 100);
+    });
+</script>  
